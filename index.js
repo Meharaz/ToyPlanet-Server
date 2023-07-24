@@ -38,11 +38,26 @@ async function run() {
             res.send(result);
         })
         // find
-        app.get('/toys', async(req, res)=>{
-            const cursor = toyCollection.find();
-            const result = await cursor.toArray();
+        // app.get('/toys', async (req, res) => {
+        //     const cursor = toyCollection.find();
+        //     const result = await cursor.toArray();
+        //     res.send(result);
+        // })
+        // category 
+        app.get('/toyCategory/:text', async (req, res) => {
+            if (req.params.text == "Outdoor" || req.params.text == "Indoor" || req.params.text == "Kids" ) {
+                const result = await toyCollection
+                    .find({ category: req.params.text })
+                    .toArray();
+                return res.send(result);
+            }
+            const result = await toyCollection.find().toArray();
             res.send(result);
         })
+        app.get("/allToys", async (req, res) => {
+            const result = await toyCollection.find().toArray();
+            res.send(result);
+        });
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
