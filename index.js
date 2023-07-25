@@ -26,17 +26,17 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        client.connect();
 
         const toyCollection = client.db('toyPlanet').collection('toys')
+        // all toys 
 
-        // add toys
-        app.post('/toys', async (req, res) => {
-            const addToy = req.body;
-            console.log(addToy);
-            const result = await toyCollection.insertOne(addToy);
+        app.get("/allToys", async (req, res) => {
+            const result = await toyCollection.find({}).limit(20).sort({ price: 1 })
+                .collation({ locale: "en_US", numericOrdering: true }).toArray();
             res.send(result);
-        })
+        });
+        
         // find
         // app.get('/toys', async (req, res) => {
         //     const cursor = toyCollection.find();
@@ -56,13 +56,7 @@ async function run() {
         })
 
 
-        // all toys 
 
-        app.get("/allToys", async (req, res) => {
-            const result = await toyCollection.find({}).limit(20).sort({ price: 1 })
-            .collation({ locale: "en_US", numericOrdering: true }).toArray();
-            res.send(result);
-        });
 
         // single toy 
 
@@ -94,12 +88,12 @@ async function run() {
 
         app.get("/myToys/:text", async (req, res) => {
             const result = await toyCollection
-              .find({ seller: req.params.text })
-              .sort({ price: 1 })
-              .collation({ locale: "en_US", numericOrdering: true })
-              .toArray();
+                .find({ seller: req.params.text })
+                .sort({ price: 1 })
+                .collation({ locale: "en_US", numericOrdering: true })
+                .toArray();
             res.send(result);
-          });
+        });
         // update-toy
         app.put("/updateToy/:id", async (req, res) => {
             const id = req.params.id;
@@ -114,6 +108,13 @@ async function run() {
                 }
             }
             const result = await toyCollection.updateOne(filter, updateToy);
+            res.send(result);
+        })
+        // add toys
+        app.post('/toys', async (req, res) => {
+            const addToy = req.body;
+            console.log(addToy);
+            const result = await toyCollection.insertOne(addToy);
             res.send(result);
         })
         // delete Toy
