@@ -59,7 +59,8 @@ async function run() {
         // all toys 
 
         app.get("/allToys", async (req, res) => {
-            const result = await toyCollection.find({}).limit(20).toArray();
+            const result = await toyCollection.find({}).limit(20).sort({ price: 1 })
+            .collation({ locale: "en_US", numericOrdering: true }).toArray();
             res.send(result);
         });
 
